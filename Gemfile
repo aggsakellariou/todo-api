@@ -47,6 +47,7 @@ end
 
 group :development, :test do
   gem 'rspec-rails', '~> 3.5'
+  gem 'rswag-specs'
 end
 
 group :test do
@@ -57,3 +58,6 @@ group :test do
 end
 
 gem 'observer'
+
+gem 'rswag-api'
+gem 'rswag-ui'
