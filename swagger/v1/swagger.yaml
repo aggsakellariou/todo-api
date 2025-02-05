@@ -1,8 +1,13 @@
----
 openapi: 3.0.1
 info:
   title: API V1
   version: v1
+servers:
+  - url: http://{defaultHost}
+    variables:
+      defaultHost:
+        default: 127.0.0.1:3000
+
 paths:
   /todos:
     get:
@@ -16,6 +21,144 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Todo'
+    post:
+      summary: Create a todo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+
+  /todos/{id}:
+    put:
+      summary: Update a todo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+
+    delete:
+      summary: Delete a todo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+
+
+  /todos/{todo_id}/items:
+    get:
+      summary: Retrieve items for a given todo
+      parameters:
+        - in: path
+          name: todo_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+    post:
+      summary: Create an item for a todo
+      parameters:
+        - in: path
+          name: todo_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+
+  /todos/{todo_id}/items/{id}:
+    put:
+      summary: Update an item
+      parameters:
+        - in: path
+          name: todo_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+
+    delete:
+      summary: Delete an item
+      parameters:
+        - in: path
+          name: todo_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+
+# ...existing code...
 components:
   schemas:
     Todo:
@@ -25,8 +168,34 @@ components:
           type: integer
         title:
           type: string
-servers:
-  - url: https://{defaultHost}
-    variables:
-      defaultHost:
-        default: todo-api.fly.dev
+    TodoInput:
+      type: object
+      properties:
+        title:
+          type: string
+        created_by:
+          type: string
+      required:
+        - title
+        - created_by
+    Item:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        done:
+          type: boolean
+        todo_id:
+          type: integer
+    ItemInput:
+      type: object
+      properties:
+        name:
+          type: string
+        done:
+          type: boolean
+      required:
+        - name
+        - done
