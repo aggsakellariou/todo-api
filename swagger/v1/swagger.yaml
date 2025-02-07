@@ -3,163 +3,17 @@ info:
   title: API V1
   version: v1
 servers:
-  - url: https://{defaultHost}
+  - url: http://{defaultHost}
     variables:
       defaultHost:
-        default: todo-api.fly.dev
+        default: 127.0.0.1:3000
 
-paths:
-  /todos:
-    get:
-      summary: Retrieve all todos
-      responses:
-        '200':
-          description: List of todos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Todo'
-    post:
-      summary: Create a todo
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TodoInput'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Todo'
-
-  /todos/{id}:
-    put:
-      summary: Update a todo
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TodoInput'
-      responses:
-        '200':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Todo'
-
-    delete:
-      summary: Delete a todo
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: No Content
-
-
-  /todos/{todo_id}/items:
-    get:
-      summary: Retrieve items for a given todo
-      parameters:
-        - in: path
-          name: todo_id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: List of items
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Item'
-    post:
-      summary: Create an item for a todo
-      parameters:
-        - in: path
-          name: todo_id
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ItemInput'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Item'
-
-  /todos/{todo_id}/items/{id}:
-    put:
-      summary: Update an item
-      parameters:
-        - in: path
-          name: todo_id
-          required: true
-          schema:
-            type: integer
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ItemInput'
-      responses:
-        '200':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Item'
-
-    delete:
-      summary: Delete an item
-      parameters:
-        - in: path
-          name: todo_id
-          required: true
-          schema:
-            type: integer
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: No Content
-
-# ...existing code...
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Todo:
       type: object
@@ -173,11 +27,8 @@ components:
       properties:
         title:
           type: string
-        created_by:
-          type: string
       required:
         - title
-        - created_by
     Item:
       type: object
       properties:
@@ -199,3 +50,255 @@ components:
       required:
         - name
         - done
+
+security:
+  - bearerAuth: []
+
+paths:
+  /signup:
+    post:
+      summary: User signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Created
+
+  /auth/login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: OK
+
+  /auth/logout:
+    get:
+      summary: User logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+
+  /todos:
+    get:
+      summary: Retrieve all todos
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    post:
+      summary: Create a todo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+
+  /todos/{id}:
+    get:
+      summary: Retrieve a specific todo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+    put:
+      summary: Update a todo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+    delete:
+      summary: Delete a todo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+
+  /todos/{todo_id}/items:
+    get:
+      summary: Retrieve items for a given todo
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: todo_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+    post:
+      summary: Create an item for a todo
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: todo_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+
+  /todos/{todo_id}/items/{id}:
+    get:
+      summary: Retrieve a specific item
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: todo_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: An item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+    put:
+      summary: Update an item
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: todo_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+    delete:
+      summary: Delete an item
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: todo_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
