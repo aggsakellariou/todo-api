@@ -35,7 +35,7 @@ Todo API is a RESTful API built with Ruby on Rails to manage tasks efficiently. 
 1. Clone this repository:
 
    ```bash
-   git clone https://github.com/your-repo/todo-api.git
+   git clone https://github.com/gvasss/todo-api.git
    cd todo-api-main
    ```
 
